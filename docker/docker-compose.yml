@@ -1,0 +1,108 @@
+services:
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.frontend
+    env_file: ../.env
+    container_name: codebase_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://localhost:3001/api
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your_client_id}
+    depends_on:
+      backend:
+        condition: service_started
+    volumes:
+      - ../frontend/src:/app/src
+    networks:
+      - codebase_network
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.backend
+    env_file: ../.env
+    container_name: codebase_backend
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your_client_id}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your_client_secret}
+      GOOGLE_REDIRECT_URI: http://localhost:3001/api/auth/callback
+      JWT_SECRET: ${JWT_SECRET:-development_secret_key_change_in_production}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-codebase_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secure_password}
+      MYSQL_DB: ${MYSQL_DB:-codebase_intelligence}
+      OLLAMA_BASE_URL: http://ollama:11434
+      CHROMA_HOST: http://chroma:8000
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - projects_data:/app/data
+      - ../backend/src:/app/src
+    networks:
+      - codebase_network
+
+  mysql:
+    image: mysql:8
+    container_name: codebase_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${MYSQL_USER:-codebase_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secure_password}
+      MYSQL_DATABASE: ${MYSQL_DB:-codebase_intelligence}
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - codebase_network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: codebase_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - codebase_network
+
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: codebase_chroma
+    ports:
+      - "8000:8000"
+    environment:
+      CHROMA_DB_IMPL: duckdb+parquet
+      PERSIST_DIRECTORY: /chroma/data
+    volumes:
+      - chroma_data:/chroma/data
+    networks:
+      - codebase_network
+
+volumes:
+  mysql_data:
+    driver: local
+  ollama_data:
+    driver: local
+  chroma_data:
+    driver: local
+  projects_data:
+    driver: local
+
+networks:
+  codebase_network:
+    driver: bridge
