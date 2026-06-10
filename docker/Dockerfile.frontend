@@ -1,0 +1,19 @@
+FROM node:22-slim
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies (including dev dependencies for Parcel dev server)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Run Parcel dev server in development mode
+# Volume mount will override src/ at runtime
+CMD ["npm", "run", "dev"]

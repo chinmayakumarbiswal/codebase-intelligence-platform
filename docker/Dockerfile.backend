@@ -1,0 +1,25 @@
+FROM node:22-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y git unzip && rm -rf /var/lib/apt/lists/*
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --omit=dev
+
+# Copy source code
+COPY src ./src
+
+# Expose port
+EXPOSE 3001
+
+# Note: Health check disabled for development - backend can be verified manually
+# Health checks are not required for local development and can cause issues with Node.js
+# To verify the backend is working, test: curl http://localhost:3001/health
+
+# Start application
+CMD ["npm", "start"]
