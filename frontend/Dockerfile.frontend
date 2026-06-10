@@ -1,0 +1,22 @@
+FROM node:22-slim
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY src ./src
+COPY index.html ./
+
+# Expose Parcel dev server port
+EXPOSE 3000
+
+# Set environment for Parcel
+ENV PORT=3000
+
+# Start Parcel with explicit port binding
+CMD ["sh", "-c", "npx parcel serve index.html --port 3000 --host 0.0.0.0"]

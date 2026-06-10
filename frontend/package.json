@@ -1,0 +1,33 @@
+{
+  "name": "codebase-intelligence-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for AI Codebase Intelligence Platform",
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "build": "parcel build src/index.html",
+    "start": "npm run dev",
+    "lint": "eslint src/**/*.{js,jsx}",
+    "format": "prettier --write src/**/*.{js,jsx}"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.0",
+    "@mui/material": "^5.14.0",
+    "axios": "^1.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "reactflow": "^11.10.0",
+    "zustand": "^4.4.0"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3",
+    "eslint": "^8.54.0",
+    "parcel": "^2.10.0",
+    "prettier": "^3.1.0"
+  },
+  "browserslist": [
+    "defaults"
+  ]
+}

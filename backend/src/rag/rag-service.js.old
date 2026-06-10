@@ -1,0 +1,308 @@
+import axios from 'axios';
+import { getChunkingEmbeddingService } from '../embeddings/chunking-service.js';
+import { getPool } from '../database/connection.js';
+import logger from '../utils/logger.js';
+
+/**
+ * RAG (Retrieval-Augmented Generation) Service
+ * Retrieves relevant code chunks and generates contextual responses using local LLM
+ */
+
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://ollama:11434';
+const LLM_MODEL = 'mistral:7b'; // Local model for fast inference
+const EMBEDDING_MODEL = 'nomic-embed-text'; // Embedding model
+
+export class RAGService {
+  constructor() {
+    this.embeddingService = getChunkingEmbeddingService();
+    this._pool = null; // Lazy initialization
+    this.ollamaClient = axios.create({
+      baseURL: OLLAMA_BASE_URL,
+      timeout: 300000, // LLM generation can take 2-3+ minutes on slower hardware
+    });
+  }
+
+  /**
+   * Get pool with lazy initialization
+   */
+  get pool() {
+    if (!this._pool) {
+      this._pool = getPool();
+    }
+    return this._pool;
+  }
+
+  /**
+   * Generate response with RAG context
+   */
+  async generateRAGResponse(projectId, userId, query, conversationHistory = []) {
+    try {
+      logger.info(`[RAG] Generating response for project ${projectId}`);
+      logger.info(`[RAG] Query: "${query}"`);
+
+      // Verify project ownership
+      const [projects] = await this.pool.query(
+        'SELECT id FROM projects WHERE id = ? AND user_id = ?',
+        [projectId, userId]
+      );
+      if (projects.length === 0) {
+        throw new Error('Project not found');
+      }
+
+      // Step 1: Search for relevant code chunks
+      logger.info('[RAG] Step 1: Searching for relevant chunks');
+      const relevantChunks = await this.embeddingService.searchChunks(projectId, query, 5);
+
+      if (relevantChunks.length === 0) {
+        logger.warn('[RAG] No relevant chunks found');
+        return {
+          response: "I couldn't find relevant code to answer that question. Try uploading more code or asking a more specific question.",
+          chunks: [],
+          model: LLM_MODEL,
+          tokensUsed: 0,
+        };
+      }
+
+      logger.info(`[RAG] Found ${relevantChunks.length} relevant chunks`);
+
+      // Step 2: Build RAG prompt with context
+      logger.info('[RAG] Step 2: Building RAG prompt with context');
+      const ragPrompt = this.buildRAGPrompt(query, relevantChunks, conversationHistory);
+
+      // Step 3: Generate response from LLM
+      logger.info('[RAG] Step 3: Calling LLM for response');
+      const response = await this.generateLLMResponse(ragPrompt);
+
+      logger.info('[RAG] Response generated successfully');
+
+      return {
+        response: response.text,
+        chunks: relevantChunks,
+        model: LLM_MODEL,
+        tokensUsed: response.tokensUsed,
+      };
+    } catch (error) {
+      logger.error('[RAG] Failed to generate response:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Build RAG prompt with context from retrieved chunks
+   */
+  buildRAGPrompt(query, chunks, conversationHistory) {
+    // Build context from chunks
+    const contextParts = chunks.map((chunk, idx) => {
+      return `[Context ${idx + 1}] From ${chunk.filePath} (${chunk.chunkType}: ${chunk.chunkName}):
+\`\`\`${chunk.chunkType}
+${chunk.text}
+\`\`\``;
+    });
+
+    const context = contextParts.join('\n\n');
+
+    // Build conversation history context
+    let historyContext = '';
+    if (conversationHistory.length > 0) {
+      const recentMessages = conversationHistory.slice(-4); // Last 4 messages for context
+      historyContext = 'Recent conversation:\n';
+      recentMessages.forEach(msg => {
+        historyContext += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n`;
+      });
+      historyContext += '\n';
+    }
+
+    const systemPrompt = `You are an expert code assistant analyzing a software codebase. 
+You help developers understand code, find bugs, suggest improvements, and answer technical questions.
+You have access to relevant code snippets from the project.
+
+When answering:
+1. Reference the code snippets provided
+2. Be specific about file locations and line numbers when relevant
+3. Explain concepts clearly for developers
+4. Suggest best practices when appropriate
+5. If something is not in the provided code, say so explicitly
+
+Context from the codebase:
+${context}
+
+${historyContext}User Question: ${query}
+
+Provide a detailed, code-aware answer. Reference the code snippets by their context number [Context 1], [Context 2], etc.`;
+
+    return systemPrompt;
+  }
+
+  /**
+   * Call Ollama LLM to generate response
+   */
+  async generateLLMResponse(prompt) {
+    try {
+      logger.info('[LLM] Calling Ollama with model:', LLM_MODEL);
+
+      const response = await this.ollamaClient.post('/api/generate', {
+        model: LLM_MODEL,
+        prompt: prompt,
+        stream: false,
+        temperature: 0.7,
+        top_p: 0.9,
+        top_k: 40,
+      });
+
+      const text = response.data.response.trim();
+      const tokensUsed = response.data.eval_count || 0;
+
+      logger.info(`[LLM] Response received (${tokensUsed} tokens)`);
+
+      return {
+        text,
+        tokensUsed,
+        model: LLM_MODEL,
+      };
+    } catch (error) {
+      logger.error('[LLM] Failed to generate response:', error.message);
+
+      // Fallback response if LLM fails
+      if (error.code === 'ECONNREFUSED' || error.message.includes('ECONNREFUSED')) {
+        throw new Error('LLM service not available. Make sure Ollama is running and mistral:7b model is loaded.');
+      }
+
+      throw error;
+    }
+  }
+
+  /**
+   * Save conversation to database
+   */
+  async saveConversation(projectId, userId, messages) {
+    try {
+      // Create conversation record
+      const conversationId = this.generateId();
+      const [conversationResult] = await this.pool.query(
+        'INSERT INTO conversations (id, project_id, user_id, title, created_at) VALUES (?, ?, ?, ?, NOW())',
+        [conversationId, projectId, userId, messages[0]?.content.substring(0, 100) || 'Chat']
+      );
+
+      // Insert all messages
+      for (const message of messages) {
+        const messageId = this.generateId();
+        const sourceCodes = message.chunks ? JSON.stringify(message.chunks) : null;
+
+        await this.pool.query(
+          `INSERT INTO messages (id, conversation_id, role, content, source_chunks, created_at)
+           VALUES (?, ?, ?, ?, ?, NOW())`,
+          [messageId, conversationId, message.role, message.content, sourceCodes]
+        );
+      }
+
+      logger.info(`Saved conversation ${conversationId}`);
+      return conversationId;
+    } catch (error) {
+      logger.error('Failed to save conversation:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get conversation history
+   */
+  async getConversationHistory(conversationId, userId) {
+    try {
+      // Verify user owns this conversation
+      const [convs] = await this.pool.query(
+        `SELECT id FROM conversations WHERE id = ? AND user_id = ?`,
+        [conversationId, userId]
+      );
+
+      if (convs.length === 0) {
+        throw new Error('Conversation not found');
+      }
+
+      // Get all messages in conversation
+      const [messages] = await this.pool.query(
+        `SELECT role, content, source_chunks, created_at FROM messages 
+         WHERE conversation_id = ? 
+         ORDER BY created_at ASC`,
+        [conversationId]
+      );
+
+      return messages.map(msg => ({
+        role: msg.role,
+        content: msg.content,
+        chunks: msg.source_chunks && typeof msg.source_chunks === 'string' && msg.source_chunks.trim() ? JSON.parse(msg.source_chunks) : null,
+        timestamp: msg.created_at,
+      }));
+    } catch (error) {
+      logger.error('Failed to get conversation history:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all conversations for a project
+   */
+  async getProjectConversations(projectId, userId) {
+    try {
+      const [conversations] = await this.pool.query(
+        `SELECT id, title, created_at, (SELECT COUNT(*) FROM messages WHERE conversation_id = conversations.id) as messageCount
+         FROM conversations 
+         WHERE project_id = ? AND user_id = ?
+         ORDER BY created_at DESC`,
+        [projectId, userId]
+      );
+
+      return conversations;
+    } catch (error) {
+      logger.error('Failed to get conversations:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete conversation
+   */
+  async deleteConversation(conversationId, userId) {
+    try {
+      // Verify ownership
+      const [convs] = await this.pool.query(
+        'SELECT id FROM conversations WHERE id = ? AND user_id = ?',
+        [conversationId, userId]
+      );
+
+      if (convs.length === 0) {
+        throw new Error('Conversation not found');
+      }
+
+      // Delete messages first
+      await this.pool.query('DELETE FROM messages WHERE conversation_id = ?', [conversationId]);
+
+      // Delete conversation
+      await this.pool.query('DELETE FROM conversations WHERE id = ?', [conversationId]);
+
+      logger.info(`Deleted conversation ${conversationId}`);
+      return true;
+    } catch (error) {
+      logger.error('Failed to delete conversation:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate unique ID
+   */
+  generateId() {
+    return crypto.randomUUID?.() || Math.random().toString(36).substring(2, 11);
+  }
+}
+
+/**
+ * Singleton instance
+ */
+let serviceInstance = null;
+
+export function getRAGService() {
+  if (!serviceInstance) {
+    serviceInstance = new RAGService();
+  }
+  return serviceInstance;
+}
