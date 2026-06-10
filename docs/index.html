@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codebase Intelligence - Documentation Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tabs button {
+            padding: 12px 24px;
+            border: none;
+            background: white;
+            color: #667eea;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-tabs button.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .nav-tabs button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        h4 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h4 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .architecture-diagram {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tabs button {
+                width: 100%;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Codebase Intelligence</h1>
+            <p>Intelligent Code Analysis with AI-Powered RAG</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="showTab('architecture')">Architecture</button>
+            <button class="tab-btn" onclick="showTab('database')">Database</button>
+            <button class="tab-btn" onclick="showTab('deployment')">Deployment</button>
+            <button class="tab-btn" onclick="showTab('setup')">Setup Guide</button>
+            <button class="tab-btn" onclick="showTab('api')">API Reference</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="content-section active">
+            <h2>Project Overview</h2>
+            
+            <p>Codebase Intelligence is an advanced <strong>RAG (Retrieval-Augmented Generation)</strong> system that enables intelligent code analysis through conversational AI. Ask questions about your codebase and get contextually relevant answers powered by local LLM inference.</p>
+
+            <h3>Key Features</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📊 Code Indexing</h4>
+                    <p>Automatically clone repositories and index 20+ programming languages with intelligent code chunking.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🧠 AI-Powered Search</h4>
+                    <p>768-dimensional vector embeddings for semantic similarity search across your entire codebase.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>💬 Chat Interface</h4>
+                    <p>Natural language queries with source code retrieval and contextual answers from LangChain RAG.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔒 Privacy First</h4>
+                    <p>Local LLM inference with Ollama - no data sent to external APIs.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⚡ Real-time Progress</h4>
+                    <p>Live tracking of indexing progress with file count and embedding status updates.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎯 Multi-Project</h4>
+                    <p>Manage multiple repositories with project isolation and concurrent indexing support.</p>
+                </div>
+            </div>
+
+            <h3>Technology Stack</h3>
+            <table>
+                <tr>
+                    <th>Component</th>
+                    <th>Technology</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td><strong>Frontend</strong></td>
+                    <td>React 18 + Vite + Material-UI</td>
+                    <td>User interface and chat experience</td>
+                </tr>
+                <tr>
+                    <td><strong>Backend</strong></td>
+                    <td>Express.js + LangChain</td>
+                    <td>RAG orchestration and API</td>
+                </tr>
+                <tr>
+                    <td><strong>Database</strong></td>
+                    <td>MySQL 8</td>
+                    <td>Persistent user and project data</td>
+                </tr>
+                <tr>
+                    <td><strong>Vector Store</strong></td>
+                    <td>Chroma</td>
+                    <td>Semantic embeddings and similarity search</td>
+                </tr>
+                <tr>
+                    <td><strong>LLM</strong></td>
+                    <td>Ollama (tinyllama + nomic-embed-text)</td>
+                    <td>Local inference (chat & embeddings)</td>
+                </tr>
+                <tr>
+                    <td><strong>Container</strong></td>
+                    <td>Docker & Docker Compose</td>
+                    <td>Service orchestration</td>
+                </tr>
+            </table>
+
+            <h3>Quick Start</h3>
+            <div class="success-box">
+                <strong>Ready to get started?</strong> Jump to the <strong>Setup Guide</strong> tab for installation instructions.
+            </div>
+
+            <h3>System Architecture Overview</h3>
+            <div class="architecture-diagram">┌─────────────────────────────────────┐
+│  Frontend (React)                   │
+│  Port 3000                          │
+└──────────────┬──────────────────────┘
+               │ HTTP/REST
+┌──────────────▼──────────────────────┐
+│  Backend (Express + LangChain)      │
+│  Port 3001                          │
+└────┬──────────────┬────────────┬────┘
+     │              │            │
+     ▼              ▼            ▼
+┌─────────┐  ┌──────────┐  ┌──────────┐
+│ MySQL   │  │ Chroma   │  │ Ollama   │
+│ 3306    │  │ 8000     │  │ 11434    │
+└─────────┘  └──────────┘  └──────────┘</div>
+        </div>
+
+        <!-- ARCHITECTURE TAB -->
+        <div id="architecture" class="content-section">
+            <h2>System Architecture</h2>
+            
+            <h3>Three-Tier Architecture</h3>
+            <p>Codebase Intelligence follows a three-tier architecture pattern with microservices for separation of concerns:</p>
+
+            <h4>Presentation Layer (Frontend)</h4>
+            <ul>
+                <li>React 18 with Material-UI components</li>
+                <li>Vite for fast development and production builds</li>
+                <li>Real-time progress tracking with 500ms polling</li>
+                <li>Zustand for state management (auth, conversations)</li>
+            </ul>
+
+            <h4>Application Layer (Backend)</h4>
+            <ul>
+                <li>Express.js REST API on port 3001</li>
+                <li>LangChain RAG orchestration engine</li>
+                <li>JWT authentication with OAuth2 integration</li>
+                <li>Background indexing with progress tracking</li>
+            </ul>
+
+            <h4>Data Layer (Storage & Services)</h4>
+            <ul>
+                <li><strong>MySQL:</strong> Persistent data (users, projects, conversations)</li>
+                <li><strong>Chroma:</strong> Vector embeddings with similarity search</li>
+                <li><strong>Ollama:</strong> Local LLM inference (tinyllama + nomic-embed-text)</li>
+            </ul>
+
+            <h3>Data Flow - Chat Query</h3>
+            <div class="architecture-diagram">User Query
+    ↓
+[Frontend: Send query + JWT]
+    ↓
+[Backend: Validate JWT]
+    ↓
+[RAG Pipeline]
+├─→ [Retrieve: Similarity search in Chroma]
+├─→ [Rerank: Select top chunks]
+└─→ [Generate: Send to Ollama with context]
+    ↓
+[Return response with source chunks]
+    ↓
+[Display in chat interface]</div>
+
+            <h3>Request Timeout Configuration</h3>
+            <table>
+                <tr>
+                    <th>Component</th>
+                    <th>Timeout</th>
+                    <th>Reason</th>
+                </tr>
+                <tr>
+                    <td>Frontend Axios</td>
+                    <td>300 seconds (5 min)</td>
+                    <td>Ollama inference can take 60+ seconds</td>
+                </tr>
+                <tr>
+                    <td>Ollama Inference</td>
+                    <td>No hard limit</td>
+                    <td>Process until complete</td>
+                </tr>
+                <tr>
+                    <td>MySQL Connection</td>
+                    <td>30 seconds</td>
+                    <td>Pool timeout for idle connections</td>
+                </tr>
+            </table>
+
+            <h3>Security Architecture</h3>
+            <ul>
+                <li><strong>Authentication:</strong> JWT tokens with OAuth2 integration (GitHub/Google)</li>
+                <li><strong>Authorization:</strong> User-scoped project access control</li>
+                <li><strong>Data Isolation:</strong> Conversations isolated per project per user</li>
+                <li><strong>Database:</strong> SQL injection prevention with parameterized queries</li>
+                <li><strong>Privacy:</strong> All LLM inference local (no external API calls)</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>ℹ️ Note:</strong> For detailed architecture diagrams and technical specifications, see the <code>docs/ARCHITECTURE.md</code> file.
+            </div>
+        </div>
+
+        <!-- DATABASE TAB -->
+        <div id="database" class="content-section">
+            <h2>Database Architecture</h2>
+
+            <h3>Database Schema</h3>
+            <p><strong>Database:</strong> MySQL 8 | <strong>Name:</strong> codebase_intelligence</p>
+
+            <h3>Core Tables</h3>
+            
+            <h4>1. Users Table</h4>
+            <p>Stores user account information and OAuth credentials.</p>
+            <pre>CREATE TABLE users (
+  id VARCHAR(36) PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  full_name VARCHAR(255),
+  oauth_provider VARCHAR(50),
+  oauth_id VARCHAR(255) UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</pre>
+
+            <h4>2. Projects Table</h4>
+            <p>Stores cloned repository metadata and indexing status.</p>
+            <pre>CREATE TABLE projects (
+  id VARCHAR(36) PRIMARY KEY,
+  user_id VARCHAR(36) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  repo_url VARCHAR(2048) NOT NULL,
+  storage_path VARCHAR(2048) NOT NULL UNIQUE,
+  status ENUM('cloning', 'indexing', 'ready', 'error'),
+  file_count INT,
+  chunk_count INT,
+  indexed_at TIMESTAMP NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);</pre>
+
+            <h4>3. Conversations Table</h4>
+            <p>Stores chat session metadata.</p>
+            <pre>CREATE TABLE conversations (
+  id VARCHAR(36) PRIMARY KEY,
+  user_id VARCHAR(36) NOT NULL,
+  project_id VARCHAR(36) NOT NULL,
+  title VARCHAR(500),
+  message_count INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (project_id) REFERENCES projects(id)
+);</pre>
+
+            <h4>4. Messages Table</h4>
+            <p>Stores chat messages with source code chunks.</p>
+            <pre>CREATE TABLE messages (
+  id VARCHAR(36) PRIMARY KEY,
+  conversation_id VARCHAR(36) NOT NULL,
+  role ENUM('user', 'assistant') NOT NULL,
+  content LONGTEXT NOT NULL,
+  source_chunks JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+);</pre>
+
+            <h3>Entity Relationships</h3>
+            <ul>
+                <li><strong>User → Projects:</strong> 1:N (One user has many projects)</li>
+                <li><strong>User → Conversations:</strong> 1:N (One user has many conversations)</li>
+                <li><strong>Project → Conversations:</strong> 1:N (Project has many chats)</li>
+                <li><strong>Conversation → Messages:</strong> 1:N (Chat has many messages)</li>
+            </ul>
+
+            <h3>Indexing & Performance</h3>
+            <table>
+                <tr>
+                    <th>Table</th>
+                    <th>Index</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>users</td>
+                    <td>idx_email, idx_oauth</td>
+                    <td>Fast user lookup</td>
+                </tr>
+                <tr>
+                    <td>projects</td>
+                    <td>idx_user_id, idx_status</td>
+                    <td>Filter by user/status</td>
+                </tr>
+                <tr>
+                    <td>conversations</td>
+                    <td>idx_user_id, idx_project_id</td>
+                    <td>User conversations</td>
+                </tr>
+                <tr>
+                    <td>messages</td>
+                    <td>idx_conversation_id</td>
+                    <td>Get conversation messages</td>
+                </tr>
+            </table>
+
+            <div class="info-box">
+                <strong>ℹ️ Note:</strong> See <code>docs/DATABASE_ARCHITECTURE.md</code> for complete schema details and query patterns.
+            </div>
+        </div>
+
+        <!-- DEPLOYMENT TAB -->
+        <div id="deployment" class="content-section">
+            <h2>Deployment & Infrastructure</h2>
+
+            <h3>Container Architecture</h3>
+            <p>Codebase Intelligence uses <strong>Docker Compose</strong> to orchestrate 5 microservices:</p>
+
+            <table>
+                <tr>
+                    <th>Service</th>
+                    <th>Image</th>
+                    <th>Port</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>Frontend</td>
+                    <td>docker-frontend</td>
+                    <td>3000</td>
+                    <td>React UI (Vite)</td>
+                </tr>
+                <tr>
+                    <td>Backend</td>
+                    <td>docker-backend</td>
+                    <td>3001</td>
+                    <td>Express API + RAG</td>
+                </tr>
+                <tr>
+                    <td>MySQL</td>
+                    <td>mysql:8</td>
+                    <td>3306</td>
+                    <td>Database</td>
+                </tr>
+                <tr>
+                    <td>Chroma</td>
+                    <td>chroma:latest</td>
+                    <td>8000</td>
+                    <td>Vector Store</td>
+                </tr>
+                <tr>
+                    <td>Ollama</td>
+                    <td>ollama:latest</td>
+                    <td>11434</td>
+                    <td>LLM Server</td>
+                </tr>
+            </table>
+
+            <h3>Network & Storage</h3>
+            <ul>
+                <li><strong>Network:</strong> Docker bridge network (codebase_network)</li>
+                <li><strong>Storage Volumes:</strong>
+                    <ul>
+                        <li>mysql_data (database files)</li>
+                        <li>chroma_data (vector DB)</li>
+                        <li>ollama_data (LLM models)</li>
+                        <li>projects_data (cloned repositories)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Disk Space Requirements</h3>
+            <table>
+                <tr>
+                    <th>Component</th>
+                    <th>Size</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>MySQL Data</td>
+                    <td>100MB - 1GB</td>
+                    <td>Grows with users and messages</td>
+                </tr>
+                <tr>
+                    <td>Chroma Embeddings</td>
+                    <td>500MB - 5GB</td>
+                    <td>Scales with indexed chunks</td>
+                </tr>
+                <tr>
+                    <td>Ollama Models</td>
+                    <td>1GB (fixed)</td>
+                    <td>tinyllama (0.6GB) + nomic-embed-text (0.4GB)</td>
+                </tr>
+                <tr>
+                    <td>Cloned Projects</td>
+                    <td>500MB - 10GB+</td>
+                    <td>Depends on repository sizes</td>
+                </tr>
+                <tr>
+                    <td><strong>TOTAL</strong></td>
+                    <td><strong>2GB - 16GB+</strong></td>
+                    <td><strong>Recommend 20GB minimum</strong></td>
+                </tr>
+            </table>
+
+            <div class="warning-box">
+                <strong>⚠️ Important:</strong> Ensure you have at least 15-20GB of free disk space before deployment.
+            </div>
+
+            <h3>Memory & CPU Requirements</h3>
+            <table>
+                <tr>
+                    <th>Resource</th>
+                    <th>Minimum</th>
+                    <th>Recommended</th>
+                </tr>
+                <tr>
+                    <td>RAM</td>
+                    <td>8GB</td>
+                    <td>16GB+</td>
+                </tr>
+                <tr>
+                    <td>CPU Cores</td>
+                    <td>4 cores</td>
+                    <td>8+ cores</td>
+                </tr>
+                <tr>
+                    <td>Docker Memory Limit</td>
+                    <td>4GB</td>
+                    <td>8GB+</td>
+                </tr>
+            </table>
+
+            <h3>Startup Sequence</h3>
+            <ol>
+                <li>Docker network and volumes created</li>
+                <li>MySQL initializes database schema</li>
+                <li>Chroma loads vector indexes</li>
+                <li>Ollama loads LLM models</li>
+                <li>Backend connects to all services</li>
+                <li>Frontend builds and serves on port 3000</li>
+                <li>System ready for use</li>
+            </ol>
+
+            <div class="info-box">
+                <strong>ℹ️ Note:</strong> See <code>docs/MICROSERVICES_ARCHITECTURE.md</code> for detailed deployment specifications and diagrams.
+            </div>
+        </div>
+
+        <!-- SETUP GUIDE TAB -->
+        <div id="setup" class="content-section">
+            <h2>Setup & Deployment Guide</h2>
+
+            <h3>System Requirements</h3>
+            <table>
+                <tr>
+                    <th>Requirement</th>
+                    <th>Windows</th>
+                    <th>Linux</th>
+                </tr>
+                <tr>
+                    <td>Docker</td>
+                    <td>4.0+</td>
+                    <td>20.10+</td>
+                </tr>
+                <tr>
+                    <td>Docker Compose</td>
+                    <td>2.0+</td>
+                    <td>2.0+</td>
+                </tr>
+                <tr>
+                    <td>RAM</td>
+                    <td>8GB minimum</td>
+                    <td>8GB minimum</td>
+                </tr>
+                <tr>
+                    <td>Disk Space</td>
+                    <td>15GB free</td>
+                    <td>15GB free</td>
+                </tr>
+                <tr>
+                    <td>Git</td>
+                    <td>2.30+</td>
+                    <td>2.30+</td>
+                </tr>
+            </table>
+
+            <h3>Installation Steps</h3>
+
+            <h4>Step 1: Clone Repository</h4>
+            <pre># HTTPS (Windows)
+git clone https://github.com/chinmayakumarbiswal/codebase-intelligence-platform.git
+cd codebase-intelligence-platform
+
+# SSH (Linux/macOS)
+git clone git@github.com:chinmayakumarbiswal/codebase-intelligence-platform.git
+cd codebase-intelligence-platform</pre>
+
+            <h4>Step 2: Configure Environment</h4>
+            <pre># Copy environment template
+cp .env.example .env
+
+# Edit with your configuration
+nano .env  # or use your preferred editor</pre>
+
+            <div class="info-box">
+                <strong>Required .env variables:</strong>
+                <ul style="margin-top: 10px;">
+                    <li>MYSQL_PASSWORD</li>
+                    <li>JWT_SECRET (32+ characters)</li>
+                    <li>GITHUB_CLIENT_ID & GITHUB_CLIENT_SECRET</li>
+                    <li>Other service configurations</li>
+                </ul>
+            </div>
+
+            <h4>Step 3: Build & Deploy</h4>
+            <pre># Windows PowerShell
+cd docker
+docker-compose down
+docker rmi docker-frontend docker-backend -f
+docker-compose up --build -d
+
+# Linux/macOS Bash
+cd docker
+docker-compose down
+docker rmi docker-frontend docker-backend -f
+docker-compose up --build -d</pre>
+
+            <h4>Step 4: Verify Installation</h4>
+            <pre># Check all containers running
+docker ps
+
+# Verify services
+curl http://localhost:3000      # Frontend
+curl http://localhost:3001/api  # Backend
+curl http://localhost:8000      # Chroma
+curl http://localhost:11434     # Ollama</pre>
+
+            <h3>Access the Application</h3>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="window.open('http://localhost:3000')">
+                    Open Frontend (Port 3000)
+                </button>
+                <button class="btn btn-secondary" onclick="window.open('http://localhost:3001/api')">
+                    Backend API (Port 3001)
+                </button>
+            </div>
+
+            <h3>Production Deployment</h3>
+            
+            <h4>Windows Server</h4>
+            <ul>
+                <li>Install Docker Desktop</li>
+                <li>Clone repository</li>
+                <li>Configure .env with production credentials</li>
+                <li>Run: <code>docker-compose up -d</code></li>
+                <li>Monitor: <code>docker logs codebase_backend -f</code></li>
+            </ul>
+
+            <h4>Linux Server (Ubuntu/Debian)</h4>
+            <pre># Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Add user to docker group
+sudo usermod -aG docker $USER
+
+# Deploy
+git clone https://github.com/chinmayakumarbiswal/codebase-intelligence-platform.git
+cd codebase-intelligence-platform/docker
+docker-compose up -d</pre>
+
+            <h3>Troubleshooting</h3>
+            
+            <h4>Port Already in Use</h4>
+            <p>If port 3000, 3001, etc. are already in use:</p>
+            <pre># Find process using port
+lsof -i :3000  # macOS/Linux
+netstat -ano | findstr :3000  # Windows
+
+# Edit docker-compose.yml to use different ports
+# Change: "3000:3000" to "3001:3000"</pre>
+
+            <h4>MySQL Connection Failed</h4>
+            <pre># Check MySQL logs
+docker logs codebase_mysql
+
+# Verify credentials match .env
+# Restart MySQL
+docker-compose restart mysql</pre>
+
+            <h4>Ollama Models Not Found</h4>
+            <pre># Pull required models
+docker exec codebase_ollama ollama pull tinyllama
+docker exec codebase_ollama ollama pull nomic-embed-text
+
+# Verify
+curl http://localhost:11434/api/tags</pre>
+
+            <div class="info-box">
+                <strong>ℹ️ Complete Setup Guide:</strong> See <code>docs/SETUP_GUIDE.md</code> for detailed instructions on production deployment, backup procedures, and advanced configuration.
+            </div>
+        </div>
+
+        <!-- API REFERENCE TAB -->
+        <div id="api" class="content-section">
+            <h2>API Reference</h2>
+
+            <h3>Authentication & Base Info</h3>
+            <p>All API endpoints (except public ones) require JWT authentication via Authorization header:</p>
+            <pre>Authorization: Bearer {JWT_TOKEN}</pre>
+            <p><strong>Base URL:</strong> http://localhost:3001/api</p>
+            <p><strong>Response Format:</strong> JSON</p>
+
+            <h3>1. Authentication Endpoints</h3>
+
+            <h4>POST /auth/login</h4>
+            <p>Authenticate user with email and password.</p>
+            <pre>Body:
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+Response:
+{
+  "token": "eyJhbGc...",
+  "user": {
+    "id": "user-uuid",
+    "email": "user@example.com",
+    "fullName": "John Doe"
+  }
+}</pre>
+
+            <h4>POST /auth/github</h4>
+            <p>OAuth login with GitHub (returns redirect URL).</p>
+            <pre>Response:
+{
+  "redirectUrl": "https://github.com/login/oauth/authorize?client_id=..."
+}</pre>
+
+            <h4>GET /auth/callback</h4>
+            <p>OAuth callback handler. Redirects to /projects on success.</p>
+            <pre>Query Params: ?code=github_auth_code
+Response: Redirects to /projects (or /login on error)</pre>
+
+            <h4>GET /auth/profile</h4>
+            <p>Get current user profile (requires auth).</p>
+            <pre>Response:
+{
+  "id": "user-uuid",
+  "email": "user@example.com",
+  "fullName": "John Doe",
+  "createdAt": "2024-01-01T00:00:00Z"
+}</pre>
+
+            <h4>POST /auth/logout</h4>
+            <p>Logout user and invalidate token.</p>
+            <pre>Response:
+{
+  "message": "Logged out successfully"
+}</pre>
+
+            <h3>2. Projects Endpoints</h3>
+
+            <h4>POST /projects/clone</h4>
+            <p>Clone a Git repository and start indexing.</p>
+            <pre>Body:
+{
+  "name": "My Project",
+  "repoUrl": "https://github.com/user/repo.git",
+  "branch": "main"
+}
+
+Response:
+{
+  "projectId": "project-uuid",
+  "name": "My Project",
+  "repoUrl": "https://github.com/user/repo.git",
+  "status": "cloning",
+  "createdAt": "2024-01-15T10:00:00Z"
+}</pre>
+
+            <h4>GET /projects</h4>
+            <p>List all projects for the current user.</p>
+            <pre>Query Params: ?limit=20&offset=0
+Response:
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "repoUrl": "https://github.com/user/repo.git",
+      "status": "ready",
+      "fileCount": 120,
+      "chunkCount": 450,
+      "indexedAt": "2024-01-15T11:00:00Z",
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  ],
+  "total": 5,
+  "limit": 20,
+  "offset": 0
+}</pre>
+
+            <h4>GET /projects/:projectId</h4>
+            <p>Get details of a specific project.</p>
+            <pre>Response:
+{
+  "id": "project-uuid",
+  "name": "My Project",
+  "repoUrl": "https://github.com/user/repo.git",
+  "status": "ready",
+  "fileCount": 120,
+  "chunkCount": 450,
+  "embeddedChunks": 450,
+  "indexedAt": "2024-01-15T11:00:00Z",
+  "createdAt": "2024-01-15T10:00:00Z",
+  "files": ["src/app.js", "src/index.ts", ...]
+}</pre>
+
+            <h4>DELETE /projects/:projectId</h4>
+            <p>Delete a project and all associated data.</p>
+            <pre>Response:
+{
+  "message": "Project deleted successfully",
+  "projectId": "project-uuid"
+}</pre>
+
+            <h4>PUT /projects/:projectId</h4>
+            <p>Update project metadata.</p>
+            <pre>Body:
+{
+  "name": "Updated Project Name"
+}
+
+Response:
+{
+  "id": "project-uuid",
+  "name": "Updated Project Name",
+  "repoUrl": "https://github.com/user/repo.git",
+  "status": "ready"
+}</pre>
+
+            <h3>3. Chat Endpoints</h3>
+
+            <h4>POST /chat/conversation</h4>
+            <p>Start a new chat conversation.</p>
+            <pre>Body:
+{
+  "projectId": "project-uuid",
+  "firstMessage": "What does this project do?"
+}
+
+Response:
+{
+  "conversationId": "conv-uuid",
+  "message": {
+    "id": "msg-uuid",
+    "role": "assistant",
+    "content": "This project is...",
+    "sourceChunks": [
+      {
+        "file": "README.md",
+        "lineStart": 1,
+        "preview": "..."
+      }
+    ]
+  }
+}</pre>
+
+            <h4>GET /chat/conversations/:projectId</h4>
+            <p>List all conversations for a project.</p>
+            <pre>Query Params: ?limit=20&offset=0
+Response:
+{
+  "conversations": [
+    {
+      "id": "conv-uuid",
+      "title": "Understanding the API",
+      "messageCount": 5,
+      "updatedAt": "2024-01-15T10:30:00Z",
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  ],
+  "total": 10
+}</pre>
+
+            <h4>GET /chat/history/:conversationId</h4>
+            <p>Get message history for a conversation.</p>
+            <pre>Query Params: ?limit=50&offset=0
+Response:
+{
+  "conversationId": "conv-uuid",
+  "messages": [
+    {
+      "id": "msg-uuid",
+      "role": "user",
+      "content": "How does authentication work?",
+      "createdAt": "2024-01-15T10:25:00Z"
+    },
+    {
+      "id": "msg-uuid",
+      "role": "assistant",
+      "content": "Authentication is handled through...",
+      "sourceChunks": [...]
+    }
+  ],
+  "total": 15
+}</pre>
+
+            <h4>POST /chat/message</h4>
+            <p>Send a message in an existing conversation.</p>
+            <pre>Body:
+{
+  "conversationId": "conv-uuid",
+  "message": "What files use the database module?"
+}
+
+Response:
+{
+  "message": {
+    "id": "msg-uuid",
+    "role": "assistant",
+    "content": "Based on the codebase...",
+    "sourceChunks": [
+      {
+        "file": "src/db/connection.js",
+        "lineStart": 10,
+        "lineEnd": 25,
+        "preview": "..."
+      }
+    ]
+  }
+}</pre>
+
+            <h4>DELETE /chat/conversations/:conversationId</h4>
+            <p>Delete a conversation and all its messages.</p>
+            <pre>Response:
+{
+  "message": "Conversation deleted successfully",
+  "conversationId": "conv-uuid"
+}</pre>
+
+            <h4>PUT /chat/conversations/:conversationId</h4>
+            <p>Update conversation title.</p>
+            <pre>Body:
+{
+  "title": "New Conversation Title"
+}
+
+Response:
+{
+  "id": "conv-uuid",
+  "title": "New Conversation Title"
+}</pre>
+
+            <h3>4. Code Search & Chunks Endpoints</h3>
+
+            <h4>POST /chat/search-chunks</h4>
+            <p>Perform semantic search across indexed code chunks.</p>
+            <pre>Body:
+{
+  "query": "database connection pool",
+  "projectId": "project-uuid",
+  "limit": 10,
+  "minSimilarity": 0.7
+}
+
+Response:
+{
+  "results": [
+    {
+      "id": "chunk-uuid",
+      "file": "src/db/connection.js",
+      "language": "javascript",
+      "similarity": 0.89,
+      "lineStart": 10,
+      "lineEnd": 25,
+      "preview": "const pool = mysql.createPool({..."
+    }
+  ],
+  "totalResults": 5
+}</pre>
+
+            <h4>GET /chat/chunks/:projectId</h4>
+            <p>Get all indexed code chunks for a project.</p>
+            <pre>Query Params: ?limit=50&offset=0&language=javascript
+Response:
+{
+  "chunks": [
+    {
+      "id": "chunk-uuid",
+      "file": "src/app.js",
+      "language": "javascript",
+      "lineStart": 1,
+      "lineEnd": 50,
+      "preview": "const express = require('express');",
+      "tokens": 234
+    }
+  ],
+  "total": 450,
+  "fileCount": 120,
+  "languages": ["javascript", "html", "css"]
+}</pre>
+
+            <h4>GET /chat/progress/:projectId</h4>
+            <p>Get real-time indexing progress for a project (no auth required).</p>
+            <pre>Response:
+{
+  "projectId": "uuid",
+  "status": "indexing",
+  "percent": 45,
+  "fileCount": 120,
+  "processedFiles": 54,
+  "chunkCount": 450,
+  "embeddedChunks": 200,
+  "estimatedTimeRemaining": 120
+}</pre>
+
+            <h3>5. Embeddings Endpoints</h3>
+
+            <h4>GET /embeddings/:projectId</h4>
+            <p>Get embeddings statistics for a project.</p>
+            <pre>Response:
+{
+  "projectId": "project-uuid",
+  "totalEmbeddings": 450,
+  "embeddedChunks": 450,
+  "embeddingModel": "nomic-embed-text",
+  "embeddingDimension": 768,
+  "vectorStoreType": "chroma",
+  "averageSimilarity": 0.78
+}</pre>
+
+            <h4>POST /embeddings/search</h4>
+            <p>Advanced vector similarity search with filtering.</p>
+            <pre>Body:
+{
+  "projectId": "project-uuid",
+  "query": "authentication",
+  "limit": 20,
+  "filters": {
+    "language": "javascript",
+    "file": "src/auth/*"
+  }
+}
+
+Response:
+{
+  "results": [
+    {
+      "id": "chunk-uuid",
+      "file": "src/auth/jwt.js",
+      "similarity": 0.92,
+      "preview": "..."
+    }
+  ],
+  "searchTime": 45,
+  "totalResults": 15
+}</pre>
+
+            <h3>Error Responses</h3>
+            <pre>400 Bad Request
+{
+  "error": "Invalid request parameters",
+  "details": "projectId is required"
+}
+
+401 Unauthorized
+{
+  "error": "Invalid or missing authentication token"
+}
+
+403 Forbidden
+{
+  "error": "You don't have access to this resource"
+}
+
+404 Not Found
+{
+  "error": "Resource not found",
+  "resource": "project"
+}
+
+429 Too Many Requests
+{
+  "error": "Rate limit exceeded",
+  "retryAfter": 60
+}
+
+500 Internal Server Error
+{
+  "error": "Internal server error",
+  "requestId": "req-uuid"
+}</pre>
+
+            <h3>Response Status Codes</h3>
+            <table>
+                <tr>
+                    <th>Code</th>
+                    <th>Meaning</th>
+                </tr>
+                <tr>
+                    <td><strong>200</strong></td>
+                    <td>Success - Request completed successfully</td>
+                </tr>
+                <tr>
+                    <td><strong>201</strong></td>
+                    <td>Created - New resource created successfully</td>
+                </tr>
+                <tr>
+                    <td><strong>204</strong></td>
+                    <td>No Content - Success with no response body</td>
+                </tr>
+                <tr>
+                    <td><strong>400</strong></td>
+                    <td>Bad Request - Invalid parameters or malformed request</td>
+                </tr>
+                <tr>
+                    <td><strong>401</strong></td>
+                    <td>Unauthorized - Missing or invalid authentication token</td>
+                </tr>
+                <tr>
+                    <td><strong>403</strong></td>
+                    <td>Forbidden - Authenticated but not authorized for resource</td>
+                </tr>
+                <tr>
+                    <td><strong>404</strong></td>
+                    <td>Not Found - Resource does not exist</td>
+                </tr>
+                <tr>
+                    <td><strong>429</strong></td>
+                    <td>Too Many Requests - Rate limit exceeded</td>
+                </tr>
+                <tr>
+                    <td><strong>500</strong></td>
+                    <td>Internal Server Error - Server-side error</td>
+                </tr>
+            </table>
+
+            <div class="info-box">
+                <strong>ℹ️ Endpoint Categories:</strong>
+                <ul style="margin-top: 10px;">
+                    <li><strong>Authentication (5 endpoints):</strong> Login, OAuth, profile, logout</li>
+                    <li><strong>Projects (5 endpoints):</strong> Clone, list, get, update, delete</li>
+                    <li><strong>Chat (5 endpoints):</strong> Conversations, history, messages</li>
+                    <li><strong>Search & Chunks (3 endpoints):</strong> Semantic search, chunk retrieval, progress</li>
+                    <li><strong>Embeddings (2 endpoints):</strong> Stats and advanced search</li>
+                    <li><strong>Total: 20+ endpoints</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Codebase Intelligence Documentation | Version 1.0</p>
+        <p>See <code>docs/</code> folder for detailed markdown documentation</p>
+    </footer>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
